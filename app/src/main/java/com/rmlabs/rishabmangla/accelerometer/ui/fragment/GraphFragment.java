@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rmlabs.rishabmangla.accelerometer.AccelerometerListener;
 import com.rmlabs.rishabmangla.accelerometer.ui.customview.GraphView;
 
 
@@ -21,16 +22,18 @@ public class GraphFragment extends Fragment {
      */
     private static final String ARG_COORDINATE_NUMBER = "section_number";
     private GraphView mGraphView;
+    private static AccelerometerListener mAccelerometerListener;
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static GraphFragment newInstance(int sectionNumber) {
+    public static GraphFragment newInstance(int sectionNumber, AccelerometerListener accelerometerListener) {
         GraphFragment fragment = new GraphFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COORDINATE_NUMBER, sectionNumber);
         fragment.setArguments(args);
+        mAccelerometerListener = accelerometerListener;
         return fragment;
     }
 
@@ -40,22 +43,8 @@ public class GraphFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mGraphView = new GraphView(getActivity(), getArguments().getInt(ARG_COORDINATE_NUMBER));
+        mGraphView = new GraphView(getActivity(), mAccelerometerListener, getArguments().getInt(ARG_COORDINATE_NUMBER));
         return mGraphView;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Stop the simulation
-        // we should unregister the sensor's listener as per the best practices dev docs
-        mGraphView.stopSimulation();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Start the simulation
-        mGraphView.startSimulation();
-    }
 }

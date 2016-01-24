@@ -4,75 +4,73 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+
+import com.rmlabs.rishabmangla.accelerometer.data.AccelerometerData;
+import com.rmlabs.rishabmangla.accelerometer.AccelerometerListener;
+import com.rmlabs.rishabmangla.accelerometer.tools.LimitedSizeArray;
 
 /**
  * Created by rishabmangla on 24/01/16.
  */
-public class GraphView extends View implements SensorEventListener {
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
+public class GraphView extends View {
+    private AccelerometerListener mAccelerometerListener;
     private Paint mPaint = new Paint();
+    private LimitedSizeArray<AccelerometerData> mSensorData;
 
     private int mCoord;
     private float mXOrigin;
     private float mYOrigin;
     private float mZOrigin;
-    private float mSensorX;
-    private float mSensorY;
-    private float mSensorZ;
+    private int centerY;
+    private int widthX;
 
-    public GraphView(Context context, int coord) {
+    public GraphView(Context context, AccelerometerListener accelerometerListener, int coord) {
         super(context);
-        // Get an instance of the SensorManager
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mPaint.setColor(Color.BLUE);
+        mAccelerometerListener = accelerometerListener;
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeWidth(6f);
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
         mCoord = coord;
-    }
-
-    public void startSimulation() {
-            /*
-             * It is not necessary to get accelerometer events at a very high
-             * rate, by using a slower rate (SENSOR_DELAY_UI), we get an
-             * automatic low-pass filter, which "extracts" the gravity component
-             * of the acceleration. As an added benefit, we use less power and
-             * CPU resources.
-             * AS MENTIONED IN ANDROID DEVELOPERS DOCS
-             */
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
-    }
-
-    public void stopSimulation() {
-        mSensorManager.unregisterListener(this);
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
-            return;
-        mSensorX = event.values[0];
-        mSensorY = event.values[1];
-        mSensorZ = event.values[2];
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        widthX = (2*metrics.widthPixels)/3;
+        centerY = metrics.heightPixels/2;
+        mSensorData = new LimitedSizeArray<>(widthX);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.i("GraphView : onDraw", " X " + mSensorX + " Y " + mSensorY + " Z " + mSensorZ);
-//        canvas.drawPoint(mSensorX,mSensorY,mPaint);
-        canvas.drawLine(mXOrigin, mYOrigin, mSensorX, mSensorY, mPaint);
-        mXOrigin = mSensorX;
-        mYOrigin = mSensorY;
+        float sensorX = mAccelerometerListener.getmSensorX();
+        float sensorY = mAccelerometerListener.getmSensorY();
+        float sensorZ = mAccelerometerListener.getmSensorZ();
+        long timestamp = System.currentTimeMillis();
+        AccelerometerData data = new AccelerometerData(timestamp, sensorX, sensorY, sensorZ);
+        mSensorData.add(data);
+
+        Log.i("GraphView : onDraw", " coord " + mCoord + " X " + sensorX + " Y " + sensorY + " Z " + sensorZ);
+        for(int i = 0; i < mSensorData.size(); ++i){
+            float yCoordGraph = mCoord;
+            switch (mCoord){
+                case 1:
+                    yCoordGraph = (float) mSensorData.get(i).getX();
+                    break;
+                case 2:
+                    yCoordGraph = (float) mSensorData.get(i).getY();
+                    break;
+                case 3:
+                    yCoordGraph = (float) mSensorData.get(i).getZ();
+                    break;
+            }
+            canvas.drawPoint(i, centerY + yCoordGraph, mPaint);
+        }
+
+        mXOrigin = sensorX;
+        mYOrigin = sensorY;
+        mZOrigin = sensorZ;
         // redraw
         invalidate();
     }

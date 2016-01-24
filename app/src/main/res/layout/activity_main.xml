@@ -11,9 +11,10 @@
     tools:context=".MainActivity">
 
     <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
+        android:id="@+id/coord_tabs"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:clickable="true"
         app:tabGravity="fill"
         app:tabMode="fixed" />
 

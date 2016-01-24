@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.rmlabs.rishabmangla.accelerometer.AccelerometerListener;
 import com.rmlabs.rishabmangla.accelerometer.ui.fragment.GraphFragment;
 
 /**
@@ -11,15 +12,18 @@ import com.rmlabs.rishabmangla.accelerometer.ui.fragment.GraphFragment;
  */
 public class CoordAdapter extends FragmentPagerAdapter {
 
-    public CoordAdapter(FragmentManager fm) {
+    AccelerometerListener mAccelerometerListener;
+
+    public CoordAdapter(FragmentManager fm, AccelerometerListener accelerometerListener) {
         super(fm);
+        mAccelerometerListener = accelerometerListener;
     }
 
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a GraphFragment (defined as a static inner class below).
-        return GraphFragment.newInstance(position + 1);
+        return GraphFragment.newInstance(position + 1, mAccelerometerListener);
     }
 
     //TODO remove hard code count
