@@ -8,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
+import com.rmlabs.rishabmangla.accelerometer.R;
 import com.rmlabs.rishabmangla.accelerometer.data.AccelerometerData;
 import com.rmlabs.rishabmangla.accelerometer.AccelerometerListener;
 import com.rmlabs.rishabmangla.accelerometer.tools.LimitedSizeArray;
@@ -37,7 +38,7 @@ public class GraphView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mCoord = coord;
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        widthX = metrics.widthPixels - 50;
+        widthX = metrics.widthPixels - (int) getResources().getDimension(R.dimen.activity_horizontal_margin)*2;
         centerY = metrics.heightPixels/2;
         mSensorData = new LimitedSizeArray<>(widthX);
     }
