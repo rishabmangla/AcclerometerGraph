@@ -47,14 +47,15 @@ public class GraphFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        // Start the simulation
-        mGraphView.startSimulation();
+        // Stop the simulation
+        // we should unregister the sensor's listener as per the best practices dev docs
+        mGraphView.stopSimulation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Stop the simulation
-        mGraphView.stopSimulation();
+        // Start the simulation
+        mGraphView.startSimulation();
     }
 }
