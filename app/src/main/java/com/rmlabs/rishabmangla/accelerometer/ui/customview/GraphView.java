@@ -37,7 +37,7 @@ public class GraphView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mCoord = coord;
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        widthX = (2*metrics.widthPixels)/3;
+        widthX = metrics.widthPixels - 50;
         centerY = metrics.heightPixels/2;
         mSensorData = new LimitedSizeArray<>(widthX);
     }
@@ -47,8 +47,7 @@ public class GraphView extends View {
         float sensorX = mAccelerometerListener.getmSensorX();
         float sensorY = mAccelerometerListener.getmSensorY();
         float sensorZ = mAccelerometerListener.getmSensorZ();
-        long timestamp = System.currentTimeMillis();
-        AccelerometerData data = new AccelerometerData(timestamp, sensorX, sensorY, sensorZ);
+        AccelerometerData data = new AccelerometerData(sensorX, sensorY, sensorZ);
         mSensorData.add(data);
 
         Log.i("GraphView : onDraw", " coord " + mCoord + " X " + sensorX + " Y " + sensorY + " Z " + sensorZ);
